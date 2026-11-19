@@ -1,20 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Effect } from "effect";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authApi } from "@/lib/api/auth";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      setError(
+        oauthError === "telegram_oidc_cancelled"
+          ? "Telegram login was cancelled"
+          : "Telegram login could not be completed",
+      );
+      return;
+    }
     void Effect.runPromise(authApi.refresh()).then(
       () => router.replace("/"),
       (caught) => setError(caught instanceof Error ? caught.message : "Social login failed"),
     );
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="py-8 text-center">
@@ -27,5 +37,13 @@ export default function AuthCallbackPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<p>Completing sign-in...</p>}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 import { createHash, createHmac } from 'crypto';
 import { describe, expect, it } from 'vitest';
-import { parseRefreshTtl, verifyTelegramPayload } from './security.js';
+import { parseRefreshTtl, verifyTelegramPayload } from '../domain/security.js';
 
 function telegramPayload(authDate: number, botToken: string) {
   const data: Record<string, unknown> = {

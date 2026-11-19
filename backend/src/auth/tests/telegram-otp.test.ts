@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import { describe, expect, it, vi } from 'vitest';
-import { AuthService } from './auth.service.js';
+import { AuthService } from '../infrastructure/auth.service.js';
 
 describe('Telegram deep-link OTP', () => {
   it('rejects OTP requests without bot configuration', async () => {

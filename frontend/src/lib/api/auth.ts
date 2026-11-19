@@ -6,7 +6,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 export type PublicUser = {
   id: string;
-  email: string;
+  email: string | null;
   name: string | null;
   avatarUrl: string | null;
   emailVerified: boolean;

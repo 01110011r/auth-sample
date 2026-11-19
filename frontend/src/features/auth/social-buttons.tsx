@@ -86,6 +86,13 @@ export function SocialButtons() {
         <span className="mr-2 grid h-5 w-5 place-items-center rounded-full bg-blue-600 text-xs font-bold text-white">f</span>
         Facebook
       </a>
+      <a
+        href={`${apiUrl}/auth/telegram/oidc`}
+        className="flex h-12 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 font-semibold text-zinc-800 shadow-sm hover:border-zinc-300 hover:bg-zinc-50"
+      >
+        <span className="mr-2 grid h-5 w-5 place-items-center rounded-full bg-sky-500 text-sm text-white">✈</span>
+        Telegram
+      </a>
       {challengeId ? (
         <form className="flex flex-col gap-2" onSubmit={verifyTelegramOtp}>
           <label className="text-sm font-medium text-zinc-700">

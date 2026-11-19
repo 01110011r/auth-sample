@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-import { AuthService } from './auth.service.js';
+import { AuthService } from '../infrastructure/auth.service.js';
 import {
   ForgotPasswordDto,
   LoginDto,
@@ -23,10 +23,11 @@ import {
   TelegramAuthDto,
   TelegramOtpVerifyDto,
 } from './dto.js';
-import { JwtAuthGuard } from './jwt-auth.guard.js';
-import { AuthApplicationService } from './auth.application.js';
-import { EffectHttpAdapter } from './effect-http.adapter.js';
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { AuthApplicationService } from '../application/auth.application.js';
+import { EffectHttpAdapter } from '../application/effect-http.adapter.js';
 import { ConfigService } from '@nestjs/config';
+import { TelegramOidcService } from '../infrastructure/providers/telegram/telegram-oidc.service.js';
 
 @Controller('auth')
 export class AuthController {
@@ -35,6 +36,7 @@ export class AuthController {
     private readonly authApplication: AuthApplicationService,
     private readonly effectHttp: EffectHttpAdapter,
     private readonly config: ConfigService,
+    private readonly telegramOidc: TelegramOidcService,
   ) {}
 
   private readCookie(req: any, name: string): string | undefined {
@@ -216,6 +218,50 @@ export class AuthController {
     );
     this.setRefreshCookie(res, session.refreshToken);
     return { user: session.user, accessToken: session.accessToken };
+  }
+
+  @Get('telegram/oidc')
+  async telegramOidcStart(@Req() req: any, @Res() res: Response) {
+    const authorizationUrl = await this.telegramOidc.createAuthorization(req);
+    return res.redirect(authorizationUrl);
+  }
+
+  @Get('telegram/oidc/callback')
+  async telegramOidcCallback(
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    const query = req.query as Record<string, string | undefined>;
+    if (query.error) {
+      return res.redirect(
+        `${this.config.getOrThrow<string>('FRONTEND_URL')}/auth/callback?error=${encodeURIComponent(
+          query.error === 'access_denied'
+            ? 'telegram_oidc_cancelled'
+            : 'telegram_oidc_failed',
+        )}`,
+      );
+    }
+    if (!query.code || !query.state) {
+      return res.redirect(
+        `${this.config.getOrThrow<string>('FRONTEND_URL')}/auth/callback?error=telegram_oidc_failed`,
+      );
+    }
+    try {
+      const claims = await this.telegramOidc.exchangeCallback(
+        req,
+        query.code,
+        query.state,
+      );
+      const session = await this.auth.findOrCreateTelegramOidc(claims);
+      this.setRefreshCookie(res, session.refreshToken);
+      return res.redirect(
+        `${this.config.getOrThrow<string>('FRONTEND_URL')}/auth/callback?authenticated=true`,
+      );
+    } catch {
+      return res.redirect(
+        `${this.config.getOrThrow<string>('FRONTEND_URL')}/auth/callback?error=telegram_oidc_failed`,
+      );
+    }
   }
 
   @Get('google')

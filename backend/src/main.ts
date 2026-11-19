@@ -7,6 +7,12 @@ import { AppModule } from './app.module.js';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+  app.getHttpAdapter().getInstance().use(
+    (_req: unknown, res: { setHeader: (name: string, value: string) => void }, next: () => void) => {
+      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+      next();
+    },
+  );
   const trustedOrigins = (config.get<string>('CORS_ORIGINS') ?? '')
     .split(',')
     .map((origin) => origin.trim())

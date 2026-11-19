@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { AuthApplicationService } from './auth.application.js';
+import { AuthApplicationService } from '../application/auth.application.js';
 
 describe('AuthApplicationService', () => {
   it('returns the registration result', async () => {

@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { AuthController } from './auth.controller.js';
+import { AuthController } from '../transport/auth.controller.js';
 
 describe('auth frontend integration', () => {
   function makeController() {
@@ -45,6 +45,7 @@ describe('auth frontend integration', () => {
         authApplication as any,
         effectHttp as any,
         config as any,
+        {} as any,
       ),
     };
   }

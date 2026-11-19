@@ -75,6 +75,18 @@ export class EnvironmentVariables {
   @IsString()
   TELEGRAM_BOT_WEBHOOK_SECRET?: string;
 
+  @IsOptional()
+  @IsString()
+  TELEGRAM_CLIENT_ID?: string;
+
+  @IsOptional()
+  @IsString()
+  TELEGRAM_CLIENT_SECRET?: string;
+
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  TELEGRAM_REDIRECT_URI?: string;
+
   @IsString()
   CORS_ORIGINS = '';
 

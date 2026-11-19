@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ConfigService } from '@nestjs/config';
-import { GoogleStrategyProvider, FacebookStrategyProvider } from './social.strategy.js';
+import { GoogleStrategyProvider, FacebookStrategyProvider } from '../infrastructure/providers/social.strategy.js';
 
 describe('social provider verification', () => {
   const googleConfig = new ConfigService({

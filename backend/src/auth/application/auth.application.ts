@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Effect } from 'effect';
-import { AuthService } from './auth.service.js';
+import { AuthService } from '../infrastructure/auth.service.js';
 import {
   DatabaseError,
   InvalidCredentialsError,
   UserAlreadyExistsError,
-} from './auth.errors.js';
+} from '../domain/auth.errors.js';
 
 export type RegisterInput = {
   email: string;
